@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id           Int            @id @default(autoincrement())
+  username     String         @unique @default("")
+  password     String         @default("")
+  email        String         @unique
+  role         UserRole
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @default(now()) @updatedAt
+  borrowRecord borrowRecord[]
+  returnRecord returnRecord[]
+}
+
+model inventory {
+  id           Int            @id @default(autoincrement())
+  name         String         @default("")
+  category     String         @default("")
+  location     String         @default("")
+  quantity     Int            @default(0)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @default(now()) @updatedAt
+  borrowRecord borrowRecord[] // Relasion to BorrowRecord (One-to-Many)
+  returnRecord returnRecord[] // Relasion to ReturnRecord (One-to-Many)
+}
+
+model borrowRecord {
+  id           Int           @id @default(autoincrement())
+  user_id      Int           @default(0)
+  item_id      Int           @default(0)
+  borrow_date  DateTime      @default(now())
+  return_date  DateTime      @default(now())
+  returnRecord returnRecord?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @default(now()) @updatedAt
+  user         user          @relation(fields: [user_id], references: [id])
+  iventory     inventory     @relation(fields: [item_id], references: [id])
+}
+
+model returnRecord {
+  return_id          Int          @id @default(autoincrement())
+  borrow_id          Int          @unique
+  user_id            Int // Foreign key
+  item_id            Int // Foreign key
+  actual_return_date DateTime
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @default(now()) @updatedAt
+  borrowRecord       borrowRecord @relation(fields: [borrow_id], references: [id])
+  user               user         @relation(fields: [user_id], references: [id])
+  inventory          inventory    @relation(fields: [item_id], references: [id])
+}
+
+enum UserRole {
+  Admin
+  Member
+}
