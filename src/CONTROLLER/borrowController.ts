@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 
 const prisma = new PrismaClient();
 
+/** Create ( Peminjaman ) */
 const createBorrow = async (req: Request, res: Response): Promise<any> => {
     try {
         const { user_id, item_id } = req.body
@@ -15,7 +16,7 @@ const createBorrow = async (req: Request, res: Response): Promise<any> => {
 
         if(!findUser) {
             res.status(404).json({ 
-                message: "User not found" 
+                message: "User tidak ditemukan" 
             })
             return
         }
@@ -26,7 +27,7 @@ const createBorrow = async (req: Request, res: Response): Promise<any> => {
 
         if(!findItem) {
             res.status(404).json({
-                message: "Item not found"
+                message: "Barang tidak ditemukan"
             })
             return
         }
@@ -51,6 +52,7 @@ const createBorrow = async (req: Request, res: Response): Promise<any> => {
     }
 }
 
+/** Pengembalian (Update) */
 const returnItem = async (req: Request, res: Response): Promise<any> => {
     try {
         const borrow_id = req.body.borrow_id
@@ -61,7 +63,7 @@ const returnItem = async (req: Request, res: Response): Promise<any> => {
 
         if(!findBorrow) {
             res.status(404).json({
-                message: "Record peminjaman not found"
+                message: "Data peminjaman tidak ditemukan"
             })
             return
         }
@@ -88,6 +90,7 @@ const returnItem = async (req: Request, res: Response): Promise<any> => {
     }
 }
 
+/** Analisis */
 const analyzeUsage = async (req: Request, res: Response): Promise<any> => {
     try {
         const { start_date, end_date, group_by } = req.body;
@@ -101,7 +104,7 @@ const analyzeUsage = async (req: Request, res: Response): Promise<any> => {
                 },
             },
             include: {
-                iventory: true, // Include relation ke tabel Inventorya
+                iventory: true, // Include relation ke tabel Inventoriya
             },
         });
 

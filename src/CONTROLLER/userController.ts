@@ -5,19 +5,18 @@ import Jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient({ errorFormat: "minimal" })
 
-
+/** Create */
 const createUser = async (req: Request, res: Response): Promise<any> => {
     try {
         const {username, email, password} = req.body
 
-        
         const findEmail = await prisma.user.findFirst({
             where: { email }
         })
         
         if(findEmail) {
             res.status(400).json({
-                message: `Email has exists`
+                message: `Email sudah digunakan`
             })
             return
         }
@@ -34,7 +33,7 @@ const createUser = async (req: Request, res: Response): Promise<any> => {
         })
 
         res.status(200).json({
-            message: `User has been created`,
+            message: `User telah dibuat`,
             data: newUser
         })
         
@@ -61,14 +60,15 @@ const readUser = async (req: Request, res: Response): Promise<any> => {
                             email: { contains: search },
                         }],
                     }
-                : undefined, // Jika tidak ada search, tidak ada kondisi where
+                : undefined, 
         });
 
         res.status(200).json({
-            message: `User has been retrieved`,
+            message: `User telah ditampilkan`,
             data: allData,
         });
     } catch (error) {
+        console.log(error)
         res.status(500).json(error);
     }
 };
@@ -87,7 +87,7 @@ const updateUser = async (req: Request, res: Response): Promise<any> => {
         if (!findUser) {
             return res.status(200)
                 .json({
-                    message: `Users is not found`
+                    message: `User tidak ditemukan`
                 })
         }
 
@@ -107,7 +107,7 @@ const updateUser = async (req: Request, res: Response): Promise<any> => {
 
         return res.status(200)
             .json({
-                message: `Users has been updated`,
+                message: `User telah diperbarui`,
                 data: saveUser
             })
     } catch (error) {
@@ -126,30 +126,31 @@ const deleteUser = async (
         
         const id = req.params.id
 
-        const findUsers = await prisma.user
+        const findUser = await prisma.user
             .findFirst({
                 where: {id: Number(id)}
             })
 
-        if (!findUsers){
+        if (!findUser){
             return res.status(200)
             .json({
-                message: `Users is not found`
+                message: `User tidak ditemukan`
             })
         }
 
     
-        const saveUsers= await prisma.user
+        const saveUser= await prisma.user
             .delete({ 
                 where: {id: Number(id)}
             })
 
         return res.status(200)
             .json({
-                message: `Users has been removed`,
-                data: saveUsers
+                message: `User telah dihapus`,
+                data: saveUser
         })
     } catch (error) {
+        console.log(error)
         res.status(500)
             .json(error)
     }
@@ -158,7 +159,8 @@ const deleteUser = async (
 const authentication = async (req: Request, res: Response) : Promise<any> => {
     try {
         const {username, password} = req.body
-        /** check existing email */
+
+        /** cek username */
         const findUser = await prisma.user.findFirst({
             where: {username}
         })
@@ -166,7 +168,7 @@ const authentication = async (req: Request, res: Response) : Promise<any> => {
         if(!findUser){
             return res.status(400)
             .json({
-                message: `Email is not registered`
+                message: `Username belum terdaftar`
             })
         }
 
@@ -175,7 +177,7 @@ const authentication = async (req: Request, res: Response) : Promise<any> => {
         if(!isMatchPassword){
             return res.status(200)
             .json({
-                message: `Invalid password`
+                message: `Password Salah`
             })
         }
 
@@ -192,7 +194,7 @@ const authentication = async (req: Request, res: Response) : Promise<any> => {
 
         return res.status(200).json({
             status: "success",
-            message: "Login Berhasil ",
+            message: "Login telah berhasil ",
             token,
         })
 
@@ -203,7 +205,7 @@ const authentication = async (req: Request, res: Response) : Promise<any> => {
     }
 }
 
-export { createUser, readUser, updateUser, deleteUser, authentication}
+export { createUser, readUser, updateUser, deleteUser, authentication}
 
 
 

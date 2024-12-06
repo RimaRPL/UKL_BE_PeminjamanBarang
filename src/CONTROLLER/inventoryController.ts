@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+/** Create */
 const createInventory = async (req: Request, res: Response): Promise<any> => {
     try {
         const {name, category, location, quantity} = req.body
@@ -28,6 +29,7 @@ const createInventory = async (req: Request, res: Response): Promise<any> => {
     }
 }
 
+/** Read */
 const readInventoryById = async ( req: Request, res: Response) : Promise<any> => {
     try {
         const id = req.params.id
@@ -44,25 +46,26 @@ const readInventoryById = async ( req: Request, res: Response) : Promise<any> =>
         // Jika ID diberikan tapi data tidak ditemukan
         if (id && !data) {
             res.status(404).json({
-                message: `Item with ID ${id} not found`,
+                message: `Barang dengan ${id} tidak ditemukan`,
             });
             return;
         }
 
         res.status(200).json({
             status: 'success',
-            message: `Inventory has been retrieved`,
+            message: `Barang telah ditampilkan`,
             data: data,
         });
 
     } catch (error) {
         console.log(error)
-
         res.status(500).json(error);
         
     }
 }
 
+
+/**Update */
 const updateInventory = async ( req: Request, res: Response): Promise<any> => {
     try {
         const id = req.params.id
@@ -75,7 +78,7 @@ const updateInventory = async ( req: Request, res: Response): Promise<any> => {
 
         if(!findData){
             res.status(404).json({
-                message: `Inventory not found`
+                message: `Barang tidak ditemukan`
             })
         }
 
@@ -106,6 +109,8 @@ const updateInventory = async ( req: Request, res: Response): Promise<any> => {
     }
 }
 
+/** Delete */
+/** Id barang yang bisa dihapus hanya yang belum dipinjam */
 const deleteInventory = async (req: Request, res: Response): Promise<any> => {
     try {
         const id = req.params.id
@@ -116,7 +121,7 @@ const deleteInventory = async (req: Request, res: Response): Promise<any> => {
 
         if(!findData) {
             res.status(404).json({
-                message: `Inventory not found`
+                message: `Barang not found`
             })
         }
 
@@ -125,7 +130,8 @@ const deleteInventory = async (req: Request, res: Response): Promise<any> => {
         })
 
         res.status(200).json({
-            message: `inventory has been deleted`
+            
+            message: `Barang telah dihapus`
         })
     } catch (error) {
         console.log(error)
